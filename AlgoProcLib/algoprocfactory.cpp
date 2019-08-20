@@ -2,6 +2,8 @@
 
 #include "symmkeygenerator.h"
 #include "rsakeygenerator.h"
+#include "rsapubkeyencrypt.h"
+#include "rsaprikeydecrypt.h"
 
 using namespace KMS;
 
@@ -32,6 +34,12 @@ AlgoProcLib *AlgoProcFactory::CreateAlgoProc(ALGO_TYPE algotype)
         break;
     case ALGO_GET_KEY_RSA:
         pAlgoProcLib = new RSAKeyGenerator;
+        break;
+    case ALGO_RSA_PUB_KEY_ENC:
+        pAlgoProcLib = new RSAPubkeyEncrypt;
+        break;
+    case ALGO_RSA_PRI_KEY_DEC:
+        pAlgoProcLib = new RSAPrikeyDecrypt;
         break;
     default:
         pAlgoProcLib = new AlgoProcLib(algotype);

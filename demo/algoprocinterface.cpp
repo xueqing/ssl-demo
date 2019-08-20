@@ -15,6 +15,8 @@ map<ALGO_TYPE, string> AlgoProcInterface::m_algoMap = {
     {ALGO_DEC_BASE64, "ALGO_DEC_BASE64"},
     {ALGO_GET_KEY_SYMM, "ALGO_GET_KEY_SYMM"},
     {ALGO_GET_KEY_RSA, "ALGO_GET_KEY_RSA"},
+    {ALGO_RSA_PUB_KEY_ENC, "ALGO_RSA_PUB_KEY_ENC"},
+    {ALGO_RSA_PRI_KEY_DEC, "ALGO_RSA_PRI_KEY_DEC"},
 };
 
 AlgoProcInterface::AlgoProcInterfaceDestruct AlgoProcInterface::m_destruct;
@@ -61,6 +63,32 @@ bool AlgoProcInterface::GenerateRSAKey(AlgorithmParams &param)
     do
     {
         if(!dispatchAlgoProcLib(param, ALGO_GET_KEY_RSA))
+            break;
+
+        bret = true;
+    }while(false);
+    return bret;
+}
+
+bool AlgoProcInterface::RSAPubKeyEncrypt(AlgorithmParams &param)
+{
+    bool bret = false;
+    do
+    {
+        if(!dispatchAlgoProcLib(param, ALGO_RSA_PUB_KEY_ENC))
+            break;
+
+        bret = true;
+    }while(false);
+    return bret;
+}
+
+bool AlgoProcInterface::RSAPriKeyDecrypt(AlgorithmParams &param)
+{
+    bool bret = false;
+    do
+    {
+        if(!dispatchAlgoProcLib(param, ALGO_RSA_PRI_KEY_DEC))
             break;
 
         bret = true;

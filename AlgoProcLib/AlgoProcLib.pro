@@ -28,11 +28,17 @@ SOURCES += \
     algoproclib.cpp \
     algoprocfactory.cpp \
     symmkeygenerator.cpp \
-    rsakeygenerator.cpp
+    rsakeygenerator.cpp \
+    rsacrypt.cpp \
+    rsapubkeyencrypt.cpp \
+    rsaprikeydecrypt.cpp
 
 HEADERS += \
     algoproclib.h \
     algoprocfactory.h \
     algoproc_common.h \
     symmkeygenerator.h \
-    rsakeygenerator.h
+    rsakeygenerator.h \
+    rsacrypt.h \
+    rsapubkeyencrypt.h \
+    rsaprikeydecrypt.h

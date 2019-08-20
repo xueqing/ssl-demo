@@ -7,8 +7,8 @@
 
 using namespace std;
 
-#define TEST_BASE64 1
-#define TEST_SYMM_KEY_GENERATOR 1
+#define TEST_BASE64 0
+#define TEST_SYMM_KEY_GENERATOR 0
 #define TEST_RSA 1
 
 void TestBase64();
@@ -109,15 +109,42 @@ void TestSymmKeyGenerator()
 
 void TestRSA()
 {
-#define TEST_RSA_KEY_GENERATOR 0
-#if TEST_RSA_KEY_GENERATOR
     KMS::AlgorithmParams paramRsa;
     paramRsa.filePath = "/home/kiki/github/ssl-demo/rsa_keys";
+
+#define TEST_RSA_KEY_GENERATOR 1
+#if TEST_RSA_KEY_GENERATOR
     if(!AlgoProcInterface::GetInstance()->GenerateRSAKey(paramRsa))
     {
         printf("Generate RSA key error\n");
         assert(false);
     }
     printf("Generate RSA key success\n");
+#endif
+
+#define TEST_RSA_PUB_KEY_ENC 1
+#if TEST_RSA_PUB_KEY_ENC
+    KMS::AlgorithmParams paramRsaPub;
+    paramRsaPub.strIn = "IAmStringToBeEncryptedByRSAPubKey";
+    paramRsaPub.filePath = paramRsa.filePath;
+    if(!AlgoProcInterface::GetInstance()->RSAPubKeyEncrypt(paramRsaPub))
+    {
+        printf("RSA pub key encrypt error\n");
+        assert(false);
+    }
+    printf("RSA pub key encrypt success [strOut=%s] [lenOut=%d]\n", paramRsaPub.strOut.c_str(), paramRsaPub.lenOut);
+#endif
+
+#define TEST_RSA_PRI_KEY_DEC 1
+#if TEST_RSA_PRI_KEY_DEC
+    KMS::AlgorithmParams paramRsaPri;
+    paramRsaPri.strIn =  paramRsaPub.strOut;
+    paramRsaPri.filePath = paramRsa.filePath;
+    if(!AlgoProcInterface::GetInstance()->RSAPriKeyDecrypt(paramRsaPri))
+    {
+        printf("RSA pri key decrypt error\n");
+        assert(false);
+    }
+    printf("RSA pub key encrypt success [strOut=%s] [lenOut=%d]\n", paramRsaPri.strOut.c_str(), paramRsaPri.lenOut);
 #endif
 }

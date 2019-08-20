@@ -13,6 +13,8 @@ public:
 
     bool GenerateSymmKey(KMS::AlgorithmParams &param);
     bool GenerateRSAKey(KMS::AlgorithmParams &param);
+    bool RSAPubKeyEncrypt(KMS::AlgorithmParams &param);
+    bool RSAPriKeyDecrypt(KMS::AlgorithmParams &param);
 
     bool Base64Encode(KMS::AlgorithmParams &param);
     bool Base64Decode(KMS::AlgorithmParams &param);

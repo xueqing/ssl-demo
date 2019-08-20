@@ -11,6 +11,8 @@ enum ALGO_TYPE {
     ALGO_DEC_BASE64,
     ALGO_GET_KEY_SYMM,
     ALGO_GET_KEY_RSA,
+    ALGO_RSA_PUB_KEY_ENC,
+    ALGO_RSA_PRI_KEY_DEC,
 };
 
 struct AlgorithmParams {
