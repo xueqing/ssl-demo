@@ -10,6 +10,7 @@ enum ALGO_TYPE {
     ALGO_ENC_BASE64,
     ALGO_DEC_BASE64,
     ALGO_GET_KEY_SYMM,
+    ALGO_GET_KEY_RSA,
 };
 
 struct AlgorithmParams {
@@ -18,6 +19,7 @@ struct AlgorithmParams {
     std::string strOut;
     unsigned int lenOut = 0;
     std::string symmKey;
+    std::string filePath;
 };
 
 }//namespace KMS

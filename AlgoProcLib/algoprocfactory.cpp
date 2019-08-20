@@ -1,6 +1,7 @@
 #include "algoprocfactory.h"
 
 #include "symmkeygenerator.h"
+#include "rsakeygenerator.h"
 
 using namespace KMS;
 
@@ -28,6 +29,9 @@ AlgoProcLib *AlgoProcFactory::CreateAlgoProc(ALGO_TYPE algotype)
     switch (algotype) {
     case ALGO_GET_KEY_SYMM:
         pAlgoProcLib = new SymmKeyGenerator;
+        break;
+    case ALGO_GET_KEY_RSA:
+        pAlgoProcLib = new RSAKeyGenerator;
         break;
     default:
         pAlgoProcLib = new AlgoProcLib(algotype);

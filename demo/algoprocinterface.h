@@ -12,6 +12,7 @@ public:
     static AlgoProcInterface* GetInstance();
 
     bool GenerateSymmKey(KMS::AlgorithmParams &param);
+    bool GenerateRSAKey(KMS::AlgorithmParams &param);
 
     bool Base64Encode(KMS::AlgorithmParams &param);
     bool Base64Decode(KMS::AlgorithmParams &param);

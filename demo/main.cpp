@@ -9,11 +9,13 @@ using namespace std;
 
 #define TEST_BASE64 1
 #define TEST_SYMM_KEY_GENERATOR 1
+#define TEST_RSA 1
 
 void TestBase64();
 void TestBase64Encode(KMS::AlgorithmParams &param);
 void TestBase64Decode(KMS::AlgorithmParams &param);
 void TestSymmKeyGenerator();
+void TestRSA();
 
 int main()
 {
@@ -27,6 +29,12 @@ int main()
 #if TEST_SYMM_KEY_GENERATOR
     {
         TestSymmKeyGenerator();
+    }
+#endif
+
+#if TEST_RSA
+    {
+        TestRSA();
     }
 #endif
 
@@ -97,4 +105,19 @@ void TestSymmKeyGenerator()
         assert(false);
     }
     printf("Generate symm key success [key=%s]\n", paramKey.symmKey.c_str());
+}
+
+void TestRSA()
+{
+#define TEST_RSA_KEY_GENERATOR 0
+#if TEST_RSA_KEY_GENERATOR
+    KMS::AlgorithmParams paramRsa;
+    paramRsa.filePath = "/home/kiki/github/ssl-demo/rsa_keys";
+    if(!AlgoProcInterface::GetInstance()->GenerateRSAKey(paramRsa))
+    {
+        printf("Generate RSA key error\n");
+        assert(false);
+    }
+    printf("Generate RSA key success\n");
+#endif
 }

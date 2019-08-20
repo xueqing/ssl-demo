@@ -14,6 +14,7 @@ map<ALGO_TYPE, string> AlgoProcInterface::m_algoMap = {
     {ALGO_ENC_BASE64, "ALGO_ENC_BASE64"},
     {ALGO_DEC_BASE64, "ALGO_DEC_BASE64"},
     {ALGO_GET_KEY_SYMM, "ALGO_GET_KEY_SYMM"},
+    {ALGO_GET_KEY_RSA, "ALGO_GET_KEY_RSA"},
 };
 
 AlgoProcInterface::AlgoProcInterfaceDestruct AlgoProcInterface::m_destruct;
@@ -49,6 +50,19 @@ bool AlgoProcInterface::GenerateSymmKey(AlgorithmParams &param)
             break;
 
         param.symmKey = param64.strOut;
+        bret = true;
+    }while(false);
+    return bret;
+}
+
+bool AlgoProcInterface::GenerateRSAKey(AlgorithmParams &param)
+{
+    bool bret = false;
+    do
+    {
+        if(!dispatchAlgoProcLib(param, ALGO_GET_KEY_RSA))
+            break;
+
         bret = true;
     }while(false);
     return bret;

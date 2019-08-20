@@ -27,10 +27,12 @@ INCLUDEPATH += \
 SOURCES += \
     algoproclib.cpp \
     algoprocfactory.cpp \
-    symmkeygenerator.cpp
+    symmkeygenerator.cpp \
+    rsakeygenerator.cpp
 
 HEADERS += \
     algoproclib.h \
     algoprocfactory.h \
     algoproc_common.h \
-    symmkeygenerator.h
+    symmkeygenerator.h \
+    rsakeygenerator.h
