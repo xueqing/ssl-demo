@@ -1,6 +1,8 @@
 #ifndef ALGOPROCLIB_H
 #define ALGOPROCLIB_H
 
+#include <map>
+
 #include "algoproc_common.h"
 
 namespace KMS {
@@ -17,25 +19,19 @@ public:
         RES_VERIFY_FAILURE,
     };
 
-    enum CRPT_TYPE
-    {
-        CRYP_DEC = 0,
-        CRYP_ENC = 1,
-    };
-
-    AlgoProcLib(ALGO_TYPE algotype=ALGO_UNKNOWN);
+    AlgoProcLib();
     virtual ~AlgoProcLib();
 
-    static void Initialize(); // must be called before using it
+    static bool Initialize(std::map<std::string, std::string> &mapConfParam); // must be called before using it
+    static bool LoadRSAKey();
     static void Deinitialize(); // must be called after using it
 
-    virtual int ProcessAlgorithm(AlgorithmParams &param); //ref PROC_RES
-    int Base64Encode(AlgorithmParams &param);
-    int Base64Decode(AlgorithmParams &param);
+    virtual int ProcessAlgorithm(AlgorithmParams &); //ref PROC_RES
     static void ReleaseAlgoProcLib(AlgoProcLib *pAlgoProcLib);
 
-private:
-    ALGO_TYPE m_algotype;
+protected:
+    static std::string m_strRSAKeyPath;
+    static int m_lenSymmKey;
 };
 
 }//namespace KMS

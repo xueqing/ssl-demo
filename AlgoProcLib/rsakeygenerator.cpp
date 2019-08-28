@@ -9,7 +9,7 @@ using namespace KMS;
 const int RSA_KEY_LENGTH = 1024;
 
 RSAKeyGenerator::RSAKeyGenerator()
-    : AlgoProcLib()
+    : RSACrypt()
 {
 
 }
@@ -18,7 +18,7 @@ RSAKeyGenerator::~RSAKeyGenerator()
 {
 }
 
-int RSAKeyGenerator::ProcessAlgorithm(AlgorithmParams &param)
+int RSAKeyGenerator::ProcessAlgorithm(AlgorithmParams &/*param*/)
 {
     int nret = RES_SERVER_ERROR;
 
@@ -39,35 +39,11 @@ int RSAKeyGenerator::ProcessAlgorithm(AlgorithmParams &param)
             break;
         }
 
-        // 用作显示
-        RSA_print_fp(stdout, pRsa, 11);
+        if(SavePubKey(m_strRSAKeyPath, pRsa) != AlgoProcLib::RES_OK)
+            break;
 
-        string pubKeyPath = param.filePath + "_pub.pem";
-        if(!(pPubBio = BIO_new_file(pubKeyPath.c_str(), "w")))
-        {
-            fprintf(stderr, "%s() failed to call BIO_new_file\n", __func__);
+        if(SavePriKey(m_strRSAKeyPath, pRsa) != AlgoProcLib::RES_OK)
             break;
-        }
-        if(!PEM_write_bio_RSAPublicKey(pPubBio, pRsa))
-        {
-            fprintf(stderr, "%s() failed to call PEM_write_bio_RSAPublicKey\n", __func__);
-            break;
-        }
-        printf( "%s() save rsa pub key to %s\n", __func__, pubKeyPath.c_str());
-
-        string priKeyPath = param.filePath + "_pri.pem";
-        if(!(pPriBio = BIO_new_file(priKeyPath.c_str(), "w")))
-        {
-            fprintf(stderr, "%s() failed to call BIO_new_file\n", __func__);
-            break;
-        }
-        //这里生成的私钥没有加密，可选加密
-        if(!PEM_write_bio_RSAPrivateKey(pPriBio, pRsa, nullptr, nullptr, 0, nullptr, nullptr))
-        {
-            fprintf(stderr, "%s() failed to call PEM_write_bio_RSAPrivateKey\n", __func__);
-            break;
-        }
-        printf( "%s() save rsa pri key to %s\n", __func__, priKeyPath.c_str());
 
         nret = RES_OK;
     }while(false);

@@ -41,8 +41,4 @@ LIBS += \
     -lcrypto
 
 SOURCES += \
-    main.cpp \
-    algoprocinterface.cpp
-
-HEADERS += \
-    algoprocinterface.h
+    main.cpp

@@ -11,13 +11,10 @@ class AlgoProcInterface
 public:
     static AlgoProcInterface* GetInstance();
 
-    bool GenerateSymmKey(KMS::AlgorithmParams &param);
-    bool GenerateRSAKey(KMS::AlgorithmParams &param);
-    bool RSAPubKeyEncrypt(KMS::AlgorithmParams &param);
-    bool RSAPriKeyDecrypt(KMS::AlgorithmParams &param);
+    bool GenerateEncryptedSymmKey(KMS::AlgorithmParams &param);
+    bool DecryptSymmKey(KMS::AlgorithmParams &param);
 
-    bool Base64Encode(KMS::AlgorithmParams &param);
-    bool Base64Decode(KMS::AlgorithmParams &param);
+    bool GenerateRSAKey(KMS::AlgorithmParams &param);
 
 private:
     AlgoProcInterface();

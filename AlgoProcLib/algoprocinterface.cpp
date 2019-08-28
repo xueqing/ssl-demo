@@ -21,8 +21,6 @@ map<ALGO_TYPE, string> AlgoProcInterface::m_algoMap = {
 
 AlgoProcInterface::AlgoProcInterfaceDestruct AlgoProcInterface::m_destruct;
 
-const string SKS_DATA_PATH = "/tmp/sks";
-
 AlgoProcInterface *AlgoProcInterface::GetInstance()
 {
     if(nullptr == m_pInstance)
@@ -36,22 +34,46 @@ AlgoProcInterface *AlgoProcInterface::GetInstance()
     return m_pInstance;
 }
 
-bool AlgoProcInterface::GenerateSymmKey(AlgorithmParams &param)
+bool AlgoProcInterface::GenerateEncryptedSymmKey(AlgorithmParams &param)
 {
     bool bret = false;
     do
     {
-        // SM4 key: 128 bit
-        param.lenOut = 128/8;
-        if(!dispatchAlgoProcLib(param, ALGO_GET_KEY_SYMM))
+        // generate random string, base64 encode, get base64 decoded symm key
+        AlgorithmParams paramKey;
+        if(!dispatchAlgoProcLib(paramKey, ALGO_GET_KEY_SYMM))
             break;
 
-        AlgorithmParams param64;
-        param64.strIn = param.symmKey;
-        if(!dispatchAlgoProcLib(param64, ALGO_ENC_BASE64))
+        // RSA pub key encrypt, base64 encode, get rsa encrypted symm key
+        AlgorithmParams paramEnc;
+        paramEnc.strIn = paramKey.symmKey;
+        if(!dispatchAlgoProcLib(paramEnc, ALGO_RSA_PUB_KEY_ENC))
             break;
 
-        param.symmKey = param64.strOut;
+        param.symmKey = paramKey.symmKey;
+        param.strOut = paramEnc.strOut;
+
+        printf("%s [key=%s] [cipher=%s]\n", __func__, param.symmKey.c_str(), param.strOut.c_str());
+        bret = true;
+    }while(false);
+    return bret;
+}
+
+bool AlgoProcInterface::DecryptSymmKey(AlgorithmParams &param)
+{
+    bool bret = false;
+    do
+    {
+        // base64 decode, RSA pri key decrypt, get base64 decoded symm key
+        AlgorithmParams paramDec;
+        paramDec.strIn = param.strIn;
+        if(!dispatchAlgoProcLib(paramDec, ALGO_RSA_PRI_KEY_DEC))
+            break;
+
+        param.symmKey =  paramDec.strOut;
+        param.strOut =  param.strIn;
+
+        printf("%s [key=%s] [cipher=%s]\n", __func__, param.symmKey.c_str(), param.strOut.c_str());
         bret = true;
     }while(false);
     return bret;
@@ -68,42 +90,6 @@ bool AlgoProcInterface::GenerateRSAKey(AlgorithmParams &param)
         bret = true;
     }while(false);
     return bret;
-}
-
-bool AlgoProcInterface::RSAPubKeyEncrypt(AlgorithmParams &param)
-{
-    bool bret = false;
-    do
-    {
-        if(!dispatchAlgoProcLib(param, ALGO_RSA_PUB_KEY_ENC))
-            break;
-
-        bret = true;
-    }while(false);
-    return bret;
-}
-
-bool AlgoProcInterface::RSAPriKeyDecrypt(AlgorithmParams &param)
-{
-    bool bret = false;
-    do
-    {
-        if(!dispatchAlgoProcLib(param, ALGO_RSA_PRI_KEY_DEC))
-            break;
-
-        bret = true;
-    }while(false);
-    return bret;
-}
-
-bool AlgoProcInterface::Base64Encode(AlgorithmParams &param)
-{
-    return dispatchAlgoProcLib(param, ALGO_ENC_BASE64);
-}
-
-bool AlgoProcInterface::Base64Decode(AlgorithmParams &param)
-{
-   return dispatchAlgoProcLib(param, ALGO_DEC_BASE64);
 }
 
 AlgoProcInterface::AlgoProcInterface()

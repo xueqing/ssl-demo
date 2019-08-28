@@ -25,8 +25,10 @@ INCLUDEPATH += \
     $$PWD/../include/openssl-1.0.0
 
 SOURCES += \
+    mybase64.c \
     algoproclib.cpp \
     algoprocfactory.cpp \
+    algoprocinterface.cpp \
     symmkeygenerator.cpp \
     rsakeygenerator.cpp \
     rsacrypt.cpp \
@@ -34,9 +36,11 @@ SOURCES += \
     rsaprikeydecrypt.cpp
 
 HEADERS += \
+    mybase64.h \
     algoproclib.h \
     algoprocfactory.h \
     algoproc_common.h \
+    algoprocinterface.h \
     symmkeygenerator.h \
     rsakeygenerator.h \
     rsacrypt.h \

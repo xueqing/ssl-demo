@@ -4,6 +4,8 @@
 
 #include <openssl/rand.h>
 
+#include "mybase64.h"
+
 using namespace std;
 using namespace KMS;
 
@@ -17,22 +19,30 @@ int SymmKeyGenerator::ProcessAlgorithm(AlgorithmParams &param)
 {
     int nret = RES_SERVER_ERROR;
 
-    unsigned char buf[MAX_BUF_SIZE];
-    memset(buf, 0, MAX_BUF_SIZE);
-
-    if(param.lenOut > sizeof(buf))
+    do
     {
-        fprintf(stderr, "%s() len overflow\n", __func__);
-        return nret;
-    }
+        if(m_lenSymmKey > MAX_BUF_SIZE)
+        {
+            fprintf(stderr, "%s() len overflow\n", __func__);
+            break;
+        }
 
-    if(RAND_bytes(buf, param.lenOut) > 0)
-    {
-        param.symmKey = string(reinterpret_cast<const char*>(buf));
+        unsigned char outBuf[MAX_BUF_SIZE];
+        memset(outBuf, 0, MAX_BUF_SIZE);
+        if(RAND_bytes(outBuf, m_lenSymmKey) <= 0)
+        {
+            fprintf(stderr, "%s() generate random bytes error\n", __func__);
+            break;
+        }
+
+        char buf64[MAX_BUF_SIZE];
+        memset(buf64, 0, MAX_BUF_SIZE);
+        char *buf = reinterpret_cast<char*>(outBuf);
+        param.lenOut = Base64Encode(buf64, buf, m_lenSymmKey);
+        param.symmKey = string(buf64, param.lenOut);
+
         nret = RES_OK;
-    }
-
-    printf("%s [symm_key=%s]\n", __func__, param.symmKey.c_str());
+    }while(false);
 
     return nret;
 }

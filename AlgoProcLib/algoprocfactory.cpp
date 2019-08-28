@@ -42,7 +42,7 @@ AlgoProcLib *AlgoProcFactory::CreateAlgoProc(ALGO_TYPE algotype)
         pAlgoProcLib = new RSAPrikeyDecrypt;
         break;
     default:
-        pAlgoProcLib = new AlgoProcLib(algotype);
+        pAlgoProcLib = new AlgoProcLib;
         break;
     }
     return pAlgoProcLib;

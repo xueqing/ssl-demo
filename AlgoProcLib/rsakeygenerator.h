@@ -1,18 +1,18 @@
 #ifndef RSAKEYGENERATOR_H
 #define RSAKEYGENERATOR_H
 
-#include "algoproclib.h"
+#include "rsacrypt.h"
 
 namespace KMS {
 
-class RSAKeyGenerator : public AlgoProcLib
+class RSAKeyGenerator : public RSACrypt
 {
 public:
     RSAKeyGenerator();
     ~RSAKeyGenerator();
 
     // 生成密钥函数
-    int ProcessAlgorithm(AlgorithmParams &param) override;
+    int ProcessAlgorithm(AlgorithmParams &) override;
 };
 
 }//namespace KMS

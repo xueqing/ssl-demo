@@ -17,102 +17,117 @@ RSACrypt::RSACrypt()
 
 RSACrypt::~RSACrypt()
 {
-    CloseKey();
-    FreeRes();
 }
 
-int RSACrypt::LoadPubKey(string &filePath)
+int RSACrypt::LoadPubKey(string &filePath, RSA **pubKey)
 {
     int nret = RES_SERVER_ERROR;
 
-    BIO *pPubBio = nullptr;
+    BIO *pBio = nullptr;
     do
     {
-        string pubKeyPath = filePath + "_pub.pem";
-        if(!(pPubBio = BIO_new_file(pubKeyPath.c_str(), "rb")))
+        string keyPath = filePath + "_pub.pem";
+        if(!(pBio = BIO_new_file(keyPath.c_str(), "rb")))
         {
-            fprintf(stderr, "%s() failed to call BIO_new_file\n", __func__);
+            fprintf(stderr, "%s() failed to call BIO_new_file to read %s\n", __func__, keyPath.c_str());
             break;
         }
-        if(!PEM_read_bio_RSAPublicKey(pPubBio, &m_pubKey, nullptr, nullptr))
+        if(!PEM_read_bio_RSAPublicKey(pBio, pubKey, nullptr, nullptr))
         {
-            fprintf(stderr, "%s() failed to call PEM_read_bio_RSAPublicKey\n", __func__);
+            fprintf(stderr, "%s() failed to call PEM_read_bio_RSAPublicKey from %s\n", __func__, keyPath.c_str());
             break;
         }
-        printf( "%s() read rsa pub key from %s\n", __func__, pubKeyPath.c_str());
+        printf( "%s() read rsa pub key success\n", __func__);
 
-        RSA_print_fp(stdout, m_pubKey, 11);
-
+//        RSA_print_fp(stdout, pubKey, 11);
         nret = RES_OK;
     }while(false);
 
-    BIO_free(pPubBio);
+    BIO_free(pBio);
 
     return nret;
 }
 
-int RSACrypt::LoadPriKey(string &filePath)
+int RSACrypt::LoadPriKey(string &filePath, RSA **priKey)
 {
     int nret = RES_SERVER_ERROR;
 
-    BIO *pPriBio = nullptr;
+    BIO *pBio = nullptr;
     do
     {
-        string priKeyPath = filePath + "_pri.pem";
-        if(!(pPriBio = BIO_new_file(priKeyPath.c_str(), "rb")))
+        string keyPath = filePath + "_pri.pem";
+        if(!(pBio = BIO_new_file(keyPath.c_str(), "rb")))
         {
-            fprintf(stderr, "%s() failed to call BIO_new_file\n", __func__);
+            fprintf(stderr, "%s() failed to call BIO_new_file to read %s\n", __func__, keyPath.c_str());
             break;
         }
-        if(!PEM_read_bio_RSAPrivateKey(pPriBio, &m_priKey, nullptr, nullptr))
+        if(!PEM_read_bio_RSAPrivateKey(pBio, priKey, nullptr, nullptr))
         {
-            fprintf(stderr, "%s() failed to call PEM_read_bio_RSAPrivateKey\n", __func__);
+            fprintf(stderr, "%s() failed to call PEM_read_bio_RSAPrivateKey from %s\n", __func__, keyPath.c_str());
             break;
         }
-        printf( "%s() read rsa pri key from %s\n", __func__, priKeyPath.c_str());
+        printf( "%s() read rsa pri key success\n", __func__);
 
-        RSA_print_fp(stdout, m_priKey, 11);
-
+//        RSA_print_fp(stdout, priKey, 11);
         nret = RES_OK;
     }while(false);
-
-    BIO_free(pPriBio);
+    BIO_free(pBio);
 
     return nret;
 }
 
-int RSACrypt::CloseKey()
+int RSACrypt::SavePubKey(string &filePath, RSA *pRsa)
 {
-    if(m_pubKey)
-    {
-        RSA_free(m_pubKey);
-        m_pubKey = nullptr;
-    }
+    int nret = RES_SERVER_ERROR;
 
-    if(m_priKey)
+    BIO *pBio = nullptr;
+    do
     {
-        RSA_free(m_priKey);
-        m_priKey = nullptr;
-    }
+        string keyPath = filePath + "_pub.pem";
+        if(!(pBio = BIO_new_file(keyPath.c_str(), "w")))
+        {
+            fprintf(stderr, "%s() failed to call BIO_new_file to write %s\n", __func__, keyPath.c_str());
+            break;
+        }
+        if(!PEM_write_bio_RSAPublicKey(pBio, pRsa))
+        {
+            fprintf(stderr, "%s() failed to call PEM_write_bio_RSAPublicKey to %s\n", __func__, keyPath.c_str());
+            break;
+        }
+        printf( "%s() save rsa pub key success\n", __func__);
 
-    return 0;
+//        RSA_print_fp(stdout, pRsa, 11);
+        nret = RES_OK;
+    }while(false);
+    BIO_free(pBio);
+
+    return nret;
 }
 
-void RSACrypt::FreeRes()
+int RSACrypt::SavePriKey(string &filePath, RSA *pRsa)
 {
-    if(m_pubExpd)
+    int nret = RES_SERVER_ERROR;
+
+    BIO *pBio = nullptr;
+    do
     {
-        delete [] m_pubExpd;
-        m_pubExpd = nullptr;
-    }
-    if(m_priExpd)
-    {
-        delete [] m_priExpd;
-        m_priExpd = nullptr;
-    }
-    if(m_module)
-    {
-        delete [] m_module;
-        m_module = nullptr;
-    }
+        string keyPath = filePath + "_pri.pem";
+        if(!(pBio = BIO_new_file(keyPath.c_str(), "w")))
+        {
+            fprintf(stderr, "%s() failed to call BIO_new_file to write %s\n", __func__, keyPath.c_str());
+            break;
+        }
+        if(!PEM_write_bio_RSAPrivateKey(pBio, pRsa,  nullptr, nullptr, 0, nullptr, nullptr))
+        {
+            fprintf(stderr, "%s() failed to call PEM_write_bio_RSAPrivateKey to %s\n", __func__, keyPath.c_str());
+            break;
+        }
+        printf( "%s() save rsa pri key success\n", __func__);
+
+//        RSA_print_fp(stdout, pRsa, 11);
+        nret = RES_OK;
+    }while(false);
+    BIO_free(pBio);
+
+    return nret;
 }

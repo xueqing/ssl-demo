@@ -16,12 +16,10 @@ enum ALGO_TYPE {
 };
 
 struct AlgorithmParams {
-    std::string uid;
     std::string strIn;
     std::string strOut;
-    unsigned int lenOut = 0;
+    int lenOut = 0;
     std::string symmKey;
-    std::string filePath;
 };
 
 }//namespace KMS

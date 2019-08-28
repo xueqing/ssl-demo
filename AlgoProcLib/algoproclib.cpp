@@ -10,11 +10,16 @@
 #include <openssl/buffer.h>
 
 #include "cstring.h"
+#include "rsacrypt.h"
+#include "mybase64.h"
 
 using namespace KMS;
+using namespace std;
 
-AlgoProcLib::AlgoProcLib(ALGO_TYPE algotype)
-    : m_algotype(algotype)
+string AlgoProcLib::m_strRSAKeyPath;
+int AlgoProcLib::m_lenSymmKey = 16;//default 16 bytes
+
+AlgoProcLib::AlgoProcLib()
 {
 }
 
@@ -22,159 +27,65 @@ AlgoProcLib::~AlgoProcLib()
 {
 }
 
-void KMS::AlgoProcLib::Initialize()
+bool AlgoProcLib::Initialize(map<string, string> &mapConfParam)
 {
-    /* Load the human readable error strings for libcrypto */
-    ERR_load_crypto_strings();
+    if(mapConfParam.find("rsa_key_path") == mapConfParam.end())
+    {
+        fprintf(stderr, "%s() failed to initialize rsa_key_path\n", __func__);
+        return false;
+    }
+    m_strRSAKeyPath = mapConfParam.at("rsa_key_path");
+    if(m_strRSAKeyPath.back() != '/')
+        m_strRSAKeyPath += "/";
 
-    /* Load all digest and cipher algorithms */
-    OpenSSL_add_all_algorithms();
+    if(mapConfParam.find("symm_key_len") == mapConfParam.end()
+        || CString::StringToNumber(mapConfParam.at("symm_key_len").c_str(), m_lenSymmKey) <= 0)
+    {
+        fprintf(stderr, "%s() failed to initialize symm_key_len\n", __func__);
+        return false;
+    }
 
-    /* Load config file, and other important initialisation */
-//    OPENSSL_config(NULL);//deprecated
-    OPENSSL_init();
+    return true;
+}
 
-    /* ... Do some crypto stuff here ... */
+bool AlgoProcLib::LoadRSAKey()
+{
+    bool bret = false;
+
+    RSA *pubKey = nullptr;
+    RSA *priKey = nullptr;
+
+    do
+    {
+        if(!(pubKey = RSA_new()) || !(priKey = RSA_new()))
+        {
+            fprintf(stderr, "%s() failed to new RSA\n", __func__);
+            break;
+        }
+
+        if(RSACrypt::LoadPubKey(m_strRSAKeyPath, &pubKey) != AlgoProcLib::RES_OK)
+            break;
+
+        if(RSACrypt::LoadPriKey(m_strRSAKeyPath, &priKey) != AlgoProcLib::RES_OK)
+            break;
+
+        bret = true;
+    }while(false);
+
+    RSA_free(pubKey);
+    RSA_free(priKey);
+
+    return bret;
 }
 
 void AlgoProcLib::Deinitialize()
 {
-    /* Clean up */
 
-    /* Removes all digests and ciphers */
-    EVP_cleanup();
-
-    /* if you omit the next, a small leak may be left when you make use of the BIO (low level API) for e.g. base64 transformations */
-    CRYPTO_cleanup_all_ex_data();
-
-    /* Remove error strings */
-    ERR_free_strings();
 }
 
-int AlgoProcLib::ProcessAlgorithm(AlgorithmParams &param)
+int AlgoProcLib::ProcessAlgorithm(AlgorithmParams &/*param*/)
 {
-    int nret = RES_OK;
-    switch (m_algotype) {
-    case ALGO_ENC_BASE64:
-        nret = Base64Encode(param);
-        break;
-    case ALGO_DEC_BASE64:
-        nret = Base64Decode(param);
-        break;
-    default:
-        nret = RES_NOT_SUPPORTED;
-        break;
-    }
-    return nret;
-}
-
-int AlgoProcLib::Base64Encode(AlgorithmParams &param)
-{
-    int nret = RES_SERVER_ERROR;
-    char *outBuf=nullptr;
-    BIO *pbio=nullptr, *pb64=nullptr;
-    BUF_MEM *pbuf=nullptr;
-
-    do
-    {
-        pb64 = BIO_new(BIO_f_base64());
-        pbio = BIO_new(BIO_s_mem());
-        pbio = BIO_push(pb64, pbio);
-        if(!pbio || !pb64)
-        {
-            fprintf(stderr, "%s() failed to call BIO_NEW\n", __func__);
-            break;
-        }
-
-        //Ignore newlines - write everything in one line
-        BIO_set_flags(pbio, BIO_FLAGS_BASE64_NO_NL);
-        if(BIO_set_close(pbio, BIO_NOCLOSE) <= 0)
-        {
-            ERR_print_errors_fp(stderr);
-            break;
-        }
-
-        if(BIO_write(pbio, param.strIn.c_str(), param.strIn.length()) <=0 )
-        {
-            fprintf(stderr, "%s() failed to call BIO_write\n", __func__);
-            break;
-        }
-
-        if(BIO_flush(pbio) <=0 || BIO_get_mem_ptr(pbio, &pbuf) <= 0)
-        {
-            ERR_print_errors_fp(stderr);
-            break;
-        }
-
-        outBuf = (char*)malloc(pbuf->length+1);
-        memset(outBuf, 0, pbuf->length+1);
-        memcpy(outBuf, pbuf->data, pbuf->length);
-
-        param.strOut = std::string(outBuf);
-        nret = RES_OK;
-    }while(false);
-
-    free(outBuf);
-    BIO_free_all(pbio);
-//    BIO_free_all(pb64);//error if add this
-    BUF_MEM_free(pbuf);
-
-    return nret;
-}
-
-int AlgoProcLib::Base64Decode(AlgorithmParams &param)
-{
-    int nret = RES_SERVER_ERROR;
-    unsigned char *outBuf=nullptr;
-    BIO *pbio=nullptr, *pb64=nullptr;
-
-    do
-    {
-        //Calculates the length of a decoded string
-        size_t lenIn = param.strIn.length(), padding=0;
-        if((param.strIn[lenIn-1] == '=')
-                && (param.strIn[lenIn-2] == '='))//last two chars are =
-            padding = 2;
-        else if(param.strIn[lenIn-1] == '=')//last char is =
-            padding = 1;
-
-        int lenDecoded = (lenIn * 3) / 4 - padding;
-        outBuf = (unsigned char*)malloc(lenDecoded+1);
-        memset(outBuf, 0, lenDecoded+1);
-
-        pb64 = BIO_new(BIO_f_base64());
-        char *strIn = const_cast<char*>(param.strIn.c_str());
-        pbio = BIO_new_mem_buf(strIn, -1);
-        pbio = BIO_push(pb64, pbio);
-        if(!pbio || !pb64)
-        {
-            fprintf(stderr, "%s() failed to call BIO_NEW\n", __func__);
-            break;
-        }
-
-        BIO_set_flags(pbio, BIO_FLAGS_BASE64_NO_NL);
-        int lenRead=0;
-        if((lenRead=BIO_read(pbio, outBuf, param.strIn.length())) <= 0)
-        {
-            fprintf(stderr, "%s() failed to call BIO_read [err=%d]\n", __func__, lenRead);
-            break;
-        }
-        if(lenDecoded != lenRead)//length should equal decodeLen, else something went horribly wrong
-        {
-            fprintf(stderr, "%s() failed to decode base64 [%d!=%d]\n", __func__, lenDecoded, lenRead);
-            break;
-        }
-
-        param.lenOut = lenRead;
-        param.strOut = std::string(reinterpret_cast<const char*>(outBuf));
-        nret = RES_OK;
-    }while(false);
-
-    free(outBuf);
-    BIO_free_all(pbio);
-//    BIO_free_all(pb64);//error if add this
-
-    return nret;
+    return RES_OK;
 }
 
 void AlgoProcLib::ReleaseAlgoProcLib(AlgoProcLib *pAlgoProcLib)
