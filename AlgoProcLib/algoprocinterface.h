@@ -16,6 +16,9 @@ public:
 
     bool GenerateRSAKey(KMS::AlgorithmParams &param);
 
+    bool EncryptByAES(KMS::AlgorithmParams &param);
+    bool DecryptByAES(KMS::AlgorithmParams &param);
+
 private:
     AlgoProcInterface();
     static AlgoProcInterface* m_pInstance;

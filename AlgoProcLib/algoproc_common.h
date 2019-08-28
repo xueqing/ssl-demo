@@ -13,6 +13,8 @@ enum ALGO_TYPE {
     ALGO_GET_KEY_RSA,
     ALGO_RSA_PUB_KEY_ENC,
     ALGO_RSA_PRI_KEY_DEC,
+    ALGO_AES_ENC,
+    ALGO_AES_DEC,
 };
 
 struct AlgorithmParams {
@@ -20,6 +22,7 @@ struct AlgorithmParams {
     std::string strOut;
     int lenOut = 0;
     std::string symmKey;
+    std::string aesKey;
 };
 
 }//namespace KMS

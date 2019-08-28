@@ -9,9 +9,11 @@ using namespace std;
 
 #define TEST_SYMM_KEY_GENERATOR 0
 #define TEST_RSA 0
+#define TEST_AES 1
 
 void TestSymmKeyGenerator();
 void TestRSA();
+void TestAES();
 
 int main()
 {
@@ -29,6 +31,12 @@ int main()
 #if TEST_RSA
     {
         TestRSA();
+    }
+#endif
+
+#if TEST_AES
+    {
+        TestAES();
     }
 #endif
 
@@ -85,4 +93,45 @@ void TestRSA()
 //    }
 //    printf("RSA pri key decrypt success [strOut=%s] [lenOut=%d]\n", paramRsaPri.strOut.c_str(), paramRsaPri.lenOut);
 //#endif
+}
+
+void TestAES()
+{
+    KMS::AlgorithmParams paramKey;
+    paramKey.lenOut = 128 / 8;
+    if(!AlgoProcInterface::GetInstance()->GenerateEncryptedSymmKey(paramKey))
+    {
+        printf("Generate symm key error\n");
+        assert(false);
+    }
+    printf("Generate symm key success [key=%s]\n", paramKey.symmKey.c_str());
+
+#define TEST_AES_ENC_DEC 1
+#if TEST_AES_ENC_DEC
+    KMS::AlgorithmParams paramAesEnc;
+    paramAesEnc.aesKey = paramKey.symmKey;
+    paramAesEnc.strIn = "IAmStringToBeEncryptedByAES";//123456789 123456789 123456789 12a;;;;IAmStringToBeEncryptedByAES
+    if(!AlgoProcInterface::GetInstance()->EncryptByAES(paramAesEnc))
+    {
+        printf("AES encrypt error\n");
+        assert(false);
+    }
+    printf("AES encrypt success [strOut=%s] [lenOut=%d]\n", paramAesEnc.strOut.c_str(), paramAesEnc.lenOut);
+
+    KMS::AlgorithmParams paramAesDec;
+    paramAesDec.aesKey = paramKey.symmKey;
+    paramAesDec.strIn =  paramAesEnc.strOut;
+    if(!AlgoProcInterface::GetInstance()->DecryptByAES(paramAesDec))
+    {
+        printf("AES decrypt error\n");
+        assert(false);
+    }
+    printf("AES decrypt success [strOut=%s] [lenOut=%d]\n", paramAesDec.strOut.c_str(), paramAesDec.lenOut);
+
+    if(paramAesEnc.strIn != paramAesDec.strOut)
+    {
+        printf("AES test error\n");
+        assert(false);
+    }
+#endif
 }

@@ -33,7 +33,9 @@ SOURCES += \
     rsakeygenerator.cpp \
     rsacrypt.cpp \
     rsapubkeyencrypt.cpp \
-    rsaprikeydecrypt.cpp
+    rsaprikeydecrypt.cpp \
+    aesencrypt.cpp \
+    aesdecrypt.cpp
 
 HEADERS += \
     mybase64.h \
@@ -45,4 +47,6 @@ HEADERS += \
     rsakeygenerator.h \
     rsacrypt.h \
     rsapubkeyencrypt.h \
-    rsaprikeydecrypt.h
+    rsaprikeydecrypt.h \
+    aesencrypt.h \
+    aesdecrypt.h

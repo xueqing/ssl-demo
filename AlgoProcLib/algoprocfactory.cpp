@@ -4,6 +4,8 @@
 #include "rsakeygenerator.h"
 #include "rsapubkeyencrypt.h"
 #include "rsaprikeydecrypt.h"
+#include "aesencrypt.h"
+#include "aesdecrypt.h"
 
 using namespace KMS;
 
@@ -40,6 +42,12 @@ AlgoProcLib *AlgoProcFactory::CreateAlgoProc(ALGO_TYPE algotype)
         break;
     case ALGO_RSA_PRI_KEY_DEC:
         pAlgoProcLib = new RSAPrikeyDecrypt;
+        break;
+    case ALGO_AES_ENC:
+        pAlgoProcLib = new AESEncrypt;
+        break;
+    case ALGO_AES_DEC:
+        pAlgoProcLib = new AESDecrypt;
         break;
     default:
         pAlgoProcLib = new AlgoProcLib;
