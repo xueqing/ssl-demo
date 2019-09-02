@@ -15,6 +15,8 @@ enum ALGO_TYPE {
     ALGO_RSA_PRI_KEY_DEC,
     ALGO_AES_ENC,
     ALGO_AES_DEC,
+    ALGO_SM2_SIGN,
+    ALGO_SM2_VERIFY,
 };
 
 struct AlgorithmParams {

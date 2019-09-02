@@ -36,7 +36,11 @@ SOURCES += \
     rsaprikeydecrypt.cpp \
     aesencrypt.cpp \
     aesdecrypt.cpp \
-    aescrypt.cpp
+    aescrypt.cpp \
+    smtwocrypt.cpp \
+    smtwokeygenerator.cpp \
+    smtwosign.cpp \
+    smtwoverify.cpp
 
 HEADERS += \
     mybase64.h \
@@ -51,4 +55,8 @@ HEADERS += \
     rsaprikeydecrypt.h \
     aesencrypt.h \
     aesdecrypt.h \
-    aescrypt.h
+    aescrypt.h \
+    smtwocrypt.h \
+    smtwokeygenerator.h \
+    smtwosign.h \
+    smtwoverify.h

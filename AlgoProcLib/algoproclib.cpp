@@ -8,15 +8,18 @@
 #include <openssl/err.h>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
+#include <openssl/ec.h>
 
 #include "cstring.h"
 #include "rsacrypt.h"
+#include "smtwocrypt.h"
 #include "mybase64.h"
 
 using namespace KMS;
 using namespace std;
 
 string AlgoProcLib::m_strRSAKeyPath;
+string AlgoProcLib::m_strSM2KeyPath;
 int AlgoProcLib::m_lenSymmKey = 16;//default 16 bytes
 
 AlgoProcLib::AlgoProcLib()
@@ -74,6 +77,34 @@ bool AlgoProcLib::LoadRSAKey()
 
     RSA_free(pubKey);
     RSA_free(priKey);
+
+    return bret;
+}
+
+bool AlgoProcLib::LoadSM2Key()
+{
+    bool bret = false;
+
+    EVP_PKEY *pkey = nullptr;
+
+    do
+    {
+        if(!(pkey = EVP_PKEY_new()))
+        {
+            fprintf(stderr, "%s() failed to call EVP_PKEY_new\n", __func__);
+            break;
+        }
+
+        if(SMTwoCrypt::LoadPubKey(m_strSM2KeyPath, &pkey) != AlgoProcLib::RES_OK)
+            break;
+
+        if(SMTwoCrypt::LoadPriKey(m_strSM2KeyPath, &pkey) != AlgoProcLib::RES_OK)
+            break;
+
+        bret = true;
+    }while(false);
+
+    EVP_PKEY_free(pkey);
 
     return bret;
 }

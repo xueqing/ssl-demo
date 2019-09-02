@@ -24,6 +24,7 @@ public:
 
     static bool Initialize(std::map<std::string, std::string> &mapConfParam); // must be called before using it
     static bool LoadRSAKey();
+    static bool LoadSM2Key();
     static void Deinitialize(); // must be called after using it
 
     virtual int ProcessAlgorithm(AlgorithmParams &); //ref PROC_RES
@@ -31,6 +32,7 @@ public:
 
 protected:
     static std::string m_strRSAKeyPath;
+    static std::string m_strSM2KeyPath;
     static int m_lenSymmKey;
 };
 

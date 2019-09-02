@@ -6,6 +6,8 @@
 #include "rsaprikeydecrypt.h"
 #include "aesencrypt.h"
 #include "aesdecrypt.h"
+#include "smtwosign.h"
+#include "smtwoverify.h"
 
 using namespace KMS;
 
@@ -48,6 +50,12 @@ AlgoProcLib *AlgoProcFactory::CreateAlgoProc(ALGO_TYPE algotype)
         break;
     case ALGO_AES_DEC:
         pAlgoProcLib = new AESDecrypt;
+        break;
+    case ALGO_SM2_SIGN:
+        pAlgoProcLib = new SMTwoSign;
+        break;
+    case ALGO_SM2_VERIFY:
+        pAlgoProcLib = new SMTwoVerify;
         break;
     default:
         pAlgoProcLib = new AlgoProcLib;

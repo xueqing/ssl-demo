@@ -19,6 +19,8 @@ map<ALGO_TYPE, string> AlgoProcInterface::m_algoMap = {
     {ALGO_RSA_PRI_KEY_DEC, "ALGO_RSA_PRI_KEY_DEC"},
     {ALGO_AES_ENC, "ALGO_AES_ENC"},
     {ALGO_AES_DEC, "ALGO_AES_DEC"},
+    {ALGO_SM2_SIGN, "ALGO_SM2_SIGN"},
+    {ALGO_SM2_VERIFY, "ALGO_SM2_VERIFY"},
 };
 
 AlgoProcInterface::AlgoProcInterfaceDestruct AlgoProcInterface::m_destruct;
