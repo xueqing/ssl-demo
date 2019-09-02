@@ -17,6 +17,8 @@ map<ALGO_TYPE, string> AlgoProcInterface::m_algoMap = {
     {ALGO_GET_KEY_RSA, "ALGO_GET_KEY_RSA"},
     {ALGO_RSA_PUB_KEY_ENC, "ALGO_RSA_PUB_KEY_ENC"},
     {ALGO_RSA_PRI_KEY_DEC, "ALGO_RSA_PRI_KEY_DEC"},
+    {ALGO_RSA_SIGN, "ALGO_RSA_SIGN"},
+    {ALGO_RSA_VERIFY, "ALGO_RSA_VERIFY"},
     {ALGO_AES_ENC, "ALGO_AES_ENC"},
     {ALGO_AES_DEC, "ALGO_AES_DEC"},
     {ALGO_SM2_SIGN, "ALGO_SM2_SIGN"},
@@ -89,6 +91,32 @@ bool AlgoProcInterface::GenerateRSAKey(AlgorithmParams &param)
     do
     {
         if(!dispatchAlgoProcLib(param, ALGO_GET_KEY_RSA))
+            break;
+
+        bret = true;
+    }while(false);
+    return bret;
+}
+
+bool AlgoProcInterface::SignByRSA(AlgorithmParams &param)
+{
+    bool bret = false;
+    do
+    {
+        if(!dispatchAlgoProcLib(param, ALGO_RSA_SIGN))
+            break;
+
+        bret = true;
+    }while(false);
+    return bret;
+}
+
+bool AlgoProcInterface::VerifyByRSA(AlgorithmParams &param)
+{
+    bool bret = false;
+    do
+    {
+        if(!dispatchAlgoProcLib(param, ALGO_RSA_VERIFY))
             break;
 
         bret = true;

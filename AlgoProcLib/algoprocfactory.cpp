@@ -4,6 +4,8 @@
 #include "rsakeygenerator.h"
 #include "rsapubkeyencrypt.h"
 #include "rsaprikeydecrypt.h"
+#include "rsasign.h"
+#include "rsaverify.h"
 #include "aesencrypt.h"
 #include "aesdecrypt.h"
 #include "smtwosign.h"
@@ -44,6 +46,12 @@ AlgoProcLib *AlgoProcFactory::CreateAlgoProc(ALGO_TYPE algotype)
         break;
     case ALGO_RSA_PRI_KEY_DEC:
         pAlgoProcLib = new RSAPrikeyDecrypt;
+        break;
+    case ALGO_RSA_SIGN:
+        pAlgoProcLib = new RSASign;
+        break;
+    case ALGO_RSA_VERIFY:
+        pAlgoProcLib = new RSAVerify;
         break;
     case ALGO_AES_ENC:
         pAlgoProcLib = new AESEncrypt;

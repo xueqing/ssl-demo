@@ -9,11 +9,13 @@ using namespace std;
 
 #define TEST_SYMM_KEY_GENERATOR 0
 #define TEST_RSA 0
-#define TEST_AES 1
+#define TEST_AES 0
+#define TEST_RSA_SIGN_VERIYF 1
 
 void TestSymmKeyGenerator();
 void TestRSA();
 void TestAES();
+void TestRSASignVerify();
 
 int main()
 {
@@ -31,6 +33,12 @@ int main()
 #if TEST_RSA
     {
         TestRSA();
+    }
+#endif
+
+#if TEST_RSA_SIGN_VERIYF
+    {
+        TestRSASignVerify();
     }
 #endif
 
@@ -134,4 +142,23 @@ void TestAES()
         assert(false);
     }
 #endif
+}
+
+void TestRSASignVerify()
+{
+    KMS::AlgorithmParams paramRSASign;
+    paramRSASign.strIn = "IAmStringToBeSignedByRSA";
+    if(!AlgoProcInterface::GetInstance()->SignByRSA(paramRSASign))
+    {
+        printf("RSA sign error\n");
+        assert(false);
+    }
+    printf("RSA sign success [strOut=%s] [lenOut=%d]\n", paramRSASign.strOut.c_str(), paramRSASign.lenOut);
+
+    if(!AlgoProcInterface::GetInstance()->VerifyByRSA(paramRSASign))
+    {
+        printf("RSA verify error\n");
+        assert(false);
+    }
+    printf("RSA verify success [strIn=%s] [strOut=%s]\n", paramRSASign.strIn.c_str(), paramRSASign.strOut.c_str());
 }

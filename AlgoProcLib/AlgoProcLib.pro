@@ -40,7 +40,9 @@ SOURCES += \
     smtwocrypt.cpp \
     smtwokeygenerator.cpp \
     smtwosign.cpp \
-    smtwoverify.cpp
+    smtwoverify.cpp \
+    rsasign.cpp \
+    rsaverify.cpp
 
 HEADERS += \
     mybase64.h \
@@ -59,4 +61,6 @@ HEADERS += \
     smtwocrypt.h \
     smtwokeygenerator.h \
     smtwosign.h \
-    smtwoverify.h
+    smtwoverify.h \
+    rsasign.h \
+    rsaverify.h
